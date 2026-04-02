@@ -9,9 +9,6 @@ const deviceStore = useDeviceStore()
 const { coords, locatedAt, resume, error: geoError } = useGeolocation()
 const { share, isSupported: isShareSupported } = useShare()
 
-// Permission status for UX
-const geoPermission = usePermission('geolocation')
-
 // Haptic Scan State
 const isHapticScanning = ref(false)
 const scanProgress = ref(0)
