@@ -20,10 +20,8 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Vue Project**: `src/components/`, `src/pages/`, `src/services/`, `tests/`
+- Paths shown below assume Vue standard structure - adjust based on plan.md
 
 <!-- 
   ============================================================================
