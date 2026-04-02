@@ -11,4 +11,8 @@ if command -v docker-compose &> /dev/null; then
 else
   docker compose up -d --build
 fi
-npm install
+
+# NPM install only for local development
+if [ "$ENV" == "local" ]; then
+  npm install
+fi
