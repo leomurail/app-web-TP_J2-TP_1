@@ -6,11 +6,7 @@ if [ ! -f .env ]; then
   cp docker/env/.env.$ENV.template .env
   echo ".env created from $ENV template"
 fi
-if command -v docker-compose &> /dev/null; then
-  docker-compose up -d --build
-else
-  docker compose up -d --build
-fi
+task up
 
 # NPM install only for local development
 if [ "$ENV" == "local" ]; then
