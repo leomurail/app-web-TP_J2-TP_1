@@ -6,9 +6,9 @@ vars:
   COMPOSE_CMD:
     sh: |
       if [ "{{.APP_ENV}}" == "local" ]; then
-        echo "docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml"
+        echo "docker compose -f docker compose.yml -f docker/docker compose.local.yaml"
       else
-        echo "docker-compose -f docker-compose.yml -f docker/docker-compose.prod.yaml"
+        echo "docker compose -f docker compose.yml -f docker/docker compose.prod.yaml"
       fi
 
 tasks:
