@@ -29,4 +29,4 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "."
-          target: "/var/www/${{ secrets.APP_NAME }}-prod"
+          target: "/home/ubuntu/prod"
