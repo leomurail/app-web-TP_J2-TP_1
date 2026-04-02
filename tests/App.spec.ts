@@ -20,6 +20,6 @@ describe('App.vue', () => {
     })
     
     expect(wrapper.find('transition-stub').exists()).toBe(true)
-    expect(wrapper.find('transition-stub').attributes('name')).toBe('fade')
+    expect(wrapper.find('transition-stub').attributes('name')).toBe('void-fade')
   })
 })

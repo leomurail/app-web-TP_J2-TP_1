@@ -77,13 +77,28 @@ const handleShare = async () => {
 }
 
 const fetchAlerts = async () => {
+  deviceStore.syncStart()
   try {
     const response = await api.get('/alerts')
-    if (response.data.count !== undefined) {
-      deviceStore.notificationCount = response.data.count
+    if (response.data && response.data.count !== undefined) {
+      deviceStore.setMockMode(false)
+      deviceStore.syncSuccess(response.data.count)
+    } else {
+      deviceStore.syncFailure('Invalid API response format')
     }
-  } catch (err) {
-    deviceStore.incrementNotifications()
+  } catch (err: any) {
+    if (err.response?.status === 404 || err.code === 'ERR_NETWORK') {
+      // Trigger Mock Mode fallback for demo purposes
+      deviceStore.setMockMode(true)
+      setTimeout(() => {
+        const mockCount = Math.floor(Math.random() * 10) + 1
+        deviceStore.syncSuccess(deviceStore.notificationCount + mockCount)
+      }, 800)
+      return
+    }
+    
+    const message = err.response?.data?.message || err.message || 'Unable to connect to service'
+    deviceStore.syncFailure(message)
   }
 }
 
@@ -113,8 +128,8 @@ onMounted(() => {
           <!-- State: Denied (UX Friendly) -->
           <div v-else-if="geoError" class="status-box error">
             <p class="status-msg urgent">Permission Denied</p>
-            <p class="error-detail">Access to geolocation was blocked. Please enable location services in your browser settings to continue.</p>
-            <Button label="Retry Protocol" severity="danger" icon="pi pi-refresh" @click="resetGeoProtocol" class="mini-btn danger" />
+            <p class="error-detail">L'accès à la géolocalisation a été bloqué. Pour réinitialiser : cliquez sur l'icône de réglages (curseurs ou cadenas) à gauche de l'URL, puis réinitialisez l'autorisation de localisation.</p>
+            <Button label="Réessayer" severity="danger" icon="pi pi-refresh" @click="resetGeoProtocol" class="mini-btn danger" />
           </div>
 
           <!-- State: Active -->
@@ -144,10 +159,22 @@ onMounted(() => {
               <span class="counter-value">{{ deviceStore.notificationCount }}</span>
             </div>
           </div>
+          <div v-if="deviceStore.apiError" class="status-msg error mt-2">
+            System: {{ deviceStore.apiError }}
+          </div>
+          <div v-else-if="deviceStore.isMockMode" class="status-msg highlight mt-2">
+            <span class="pulse-dot"></span> System: Mock Mode Active (Local Sync)
+          </div>
         </div>
         <div class="actions-row">
           <Button label="Broadcast" icon="pi pi-bell" @click="sendNotification" class="block-action" />
-          <Button label="Sync API" icon="pi pi-refresh" @click="fetchAlerts" class="block-action" />
+          <Button 
+            label="Sync API" 
+            :icon="deviceStore.isApiSyncing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'" 
+            @click="fetchAlerts" 
+            :disabled="deviceStore.isApiSyncing"
+            class="block-action" 
+          />
         </div>
       </section>
 

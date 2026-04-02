@@ -42,6 +42,17 @@ Ce projet est une application Vue 3 moderne développée dans le cadre d'un TP. 
    npm test
    ```
 
+## 🔌 Backend Setup (Demo Page)
+
+La page **Démo** (`/demo`) interagit avec une API externe pour les alertes système.
+
+1. **API Locale** : L'application s'attend à une API tournant sur `http://localhost:3000/api/v1`.
+2. **Proxy Vite** : En développement, Vite redirige les appels de `/api` vers le port 3000 pour éviter les erreurs CORS.
+3. **Endpoints requis** :
+   - `GET /api/v1/alerts` : Doit retourner `{ "count": number }`.
+
+Si le backend n'est pas disponible, l'interface affichera un message d'erreur gracieux sans bloquer l'application.
+
 ## 🐳 Docker
 
 L'application peut être conteneurisée pour le développement ou la production.

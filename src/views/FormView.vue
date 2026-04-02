@@ -57,11 +57,11 @@ const submitForm = async () => {
                       <div class="fields-group">
                           <div class="field">
                               <label>User Name</label>
-                              <InputText v-model="formStore.userData.name" placeholder="Enter identification code..." />
+                              <InputText v-model="formStore.userData.name" name="username" autocomplete="username" placeholder="Enter identification code..." />
                           </div>
                           <div class="field">
                               <label>Secure Email</label>
-                              <InputText v-model="formStore.userData.email" placeholder="alias@network.void" />
+                              <InputText v-model="formStore.userData.email" name="email" autocomplete="email" placeholder="alias@network.void" />
                           </div>
                       </div>
                       <div class="actions justify-end">
@@ -76,11 +76,11 @@ const submitForm = async () => {
                       <div class="fields-group">
                           <div class="field">
                               <label>Physical Address</label>
-                              <InputText v-model="formStore.userData.address" placeholder="Sector coordinates..." />
+                              <InputText v-model="formStore.userData.address" name="address" autocomplete="street-address" placeholder="Sector coordinates..." />
                           </div>
                           <div class="field">
                               <label>Node City</label>
-                              <InputText v-model="formStore.userData.city" placeholder="Urban cluster identification..." />
+                              <InputText v-model="formStore.userData.city" name="city" autocomplete="address-level2" placeholder="Urban cluster identification..." />
                           </div>
                       </div>
                       <div class="actions">
