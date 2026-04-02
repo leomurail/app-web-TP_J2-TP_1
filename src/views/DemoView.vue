@@ -1,21 +1,61 @@
 <script setup lang="ts">
-import { useGeolocation, useShare } from '@vueuse/core'
+import { useGeolocation, useShare, usePermission } from '@vueuse/core'
 import { useDeviceStore } from '@/stores/device'
 import Button from 'primevue/button'
-import Card from 'primevue/card'
 import api from '@/services/api'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const deviceStore = useDeviceStore()
-const { coords, locatedAt, error, resume } = useGeolocation()
+const { coords, locatedAt, resume, error: geoError } = useGeolocation()
 const { share, isSupported: isShareSupported } = useShare()
+
+// Permission status for UX
+const geoPermission = usePermission('geolocation')
+
+// Haptic Scan State
+const isHapticScanning = ref(false)
+const scanProgress = ref(0)
+let scanInterval: any = null
+
+const startHapticScan = () => {
+  isHapticScanning.value = true
+  scanProgress.value = 0
+  scanInterval = setInterval(() => {
+    if (scanProgress.value < 100) {
+      scanProgress.value += 2
+    } else {
+      clearInterval(scanInterval)
+      deviceStore.incrementNotifications()
+      completeScan()
+    }
+  }, 30)
+}
+
+const stopHapticScan = () => {
+  isHapticScanning.value = false
+  scanProgress.value = 0
+  clearInterval(scanInterval)
+}
+
+const completeScan = () => {
+  setTimeout(() => {
+    isHapticScanning.value = false
+    scanProgress.value = 0
+  }, 1000)
+}
+
+const resetGeoProtocol = () => {
+  // We can't force the browser to show the prompt again if it's denied
+  // but we can re-trigger the resume call which might trigger it if state changed
+  resume()
+}
 
 const sendNotification = () => {
   if ('Notification' in window) {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-        new Notification('VOID_ALERT', {
-          body: 'Subsystem signal received.',
+        new Notification('Void Alert', {
+          body: 'System synchronization successful.',
           icon: '/favicon.svg'
         })
         deviceStore.incrementNotifications()
@@ -27,7 +67,7 @@ const sendNotification = () => {
 const handleShare = async () => {
   try {
     await share({
-      title: 'V_VOID',
+      title: 'Void Interface',
       text: 'Synchronizing with the void.',
       url: window.location.href,
     })
@@ -55,67 +95,98 @@ onMounted(() => {
 <template>
   <div class="demo-container">
     <header class="demo-header">
-      <span class="category">SYSTEM_RESOURCES</span>
-      <h2 class="title">Hardware_Interface</h2>
+      <span class="category">System Resources</span>
+      <h2 class="title">Hardware Interface</h2>
     </header>
 
     <div class="void-grid">
+      <!-- Geolocation Block -->
       <section class="resource-block">
-        <h3 class="block-title">GEOLOCATION_PROTOCOL</h3>
+        <h3 class="block-title">Geolocation Protocol</h3>
         <div class="data-display">
-          <div v-if="coords.latitude !== Infinity" class="coords">
-            <div class="data-row">
-              <span class="label">LAT</span>
-              <span class="value">{{ coords.latitude.toFixed(4) }}</span>
-            </div>
-            <div class="data-row">
-              <span class="label">LNG</span>
-              <span class="value">{{ coords.longitude.toFixed(4) }}</span>
-            </div>
-            <div class="status-msg" v-if="locatedAt">SYNC_OK: {{ new Date(locatedAt).toLocaleTimeString() }}</div>
+          <!-- State: Waiting for Permission/Access -->
+          <div v-if="coords.latitude === Infinity && !geoError" class="status-box">
+            <p class="status-msg highlight">Waiting for Access</p>
+            <Button label="Initialize GPS" icon="pi pi-compass" @click="resume" class="mini-btn" />
           </div>
-          <div v-else class="status-msg loading">SCANNING_SATELLITES...</div>
+
+          <!-- State: Denied (UX Friendly) -->
+          <div v-else-if="geoError" class="status-box error">
+            <p class="status-msg urgent">Permission Denied</p>
+            <p class="error-detail">Access to geolocation was blocked. Please enable location services in your browser settings to continue.</p>
+            <Button label="Retry Protocol" severity="danger" icon="pi pi-refresh" @click="resetGeoProtocol" class="mini-btn danger" />
+          </div>
+
+          <!-- State: Active -->
+          <div v-else class="coords">
+            <div class="data-row">
+              <span class="label">Latitude</span>
+              <span class="value">{{ coords.latitude.toFixed(6) }}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Longitude</span>
+              <span class="value">{{ coords.longitude.toFixed(6) }}</span>
+            </div>
+            <div class="status-msg success" v-if="locatedAt">
+              <span class="pulse-dot"></span> Sync Active
+            </div>
+          </div>
         </div>
-        <Button label="Re-Sync" icon="pi pi-refresh" @click="resume" class="block-action" />
       </section>
 
+      <!-- Network Alerts Block -->
       <section class="resource-block">
-        <h3 class="block-title">NETWORK_ALERTS</h3>
+        <h3 class="block-title">System Alerts</h3>
         <div class="data-display">
           <div class="notification-status">
-            <span class="label">ACTIVE_SIGNALS</span>
-            <span class="badge">{{ deviceStore.notificationCount }}</span>
+            <div class="alert-counter">
+              <span class="counter-label">Active Signals</span>
+              <span class="counter-value">{{ deviceStore.notificationCount }}</span>
+            </div>
           </div>
         </div>
         <div class="actions-row">
           <Button label="Broadcast" icon="pi pi-bell" @click="sendNotification" class="block-action" />
-          <Button label="Fetch" icon="pi pi-cloud-download" @click="fetchAlerts" class="block-action" />
+          <Button label="Sync API" icon="pi pi-refresh" @click="fetchAlerts" class="block-action" />
         </div>
       </section>
 
+      <!-- Web Share Block -->
       <section class="resource-block">
-        <h3 class="block-title">DATA_TRANSMISSION</h3>
+        <h3 class="block-title">Data Transfer</h3>
         <div class="data-display">
-          <div class="status-msg" v-if="isShareSupported">PROTOCOL_SUPPORTED: WEB_SHARE_V1</div>
-          <div class="status-msg error" v-else>PROTOCOL_NOT_FOUND</div>
+          <div class="status-msg highlight" v-if="isShareSupported">System: Web Share Ready</div>
+          <div class="status-msg error" v-else>System: Protocol Unsupported</div>
         </div>
         <Button 
           label="Initialize Share" 
-          icon="pi pi-share-alt" 
+          icon="pi pi-external-link" 
           @click="handleShare" 
           :disabled="!isShareSupported"
           class="block-action"
         />
       </section>
       
+      <!-- Haptic Scan Block -->
       <section class="resource-block full-width">
-        <h3 class="block-title">HAPTIC_INTERFACE_TEST</h3>
+        <h3 class="block-title">Haptic Authentication Test</h3>
         <div 
           class="touch-zone"
-          v-on:touchstart="deviceStore.incrementNotifications()"
+          :class="{ scanning: isHapticScanning, complete: scanProgress === 100 }"
+          @mousedown="startHapticScan"
+          @mouseup="stopHapticScan"
+          @mouseleave="stopHapticScan"
+          @touchstart.prevent="startHapticScan"
+          @touchend.prevent="stopHapticScan"
         >
-          <span class="scanner-line"></span>
-          PLACE_FINGER_FOR_HAPTIC_SCAN
+          <div class="scan-overlay" :style="{ width: scanProgress + '%' }"></div>
+          <span class="scanner-line" v-if="isHapticScanning"></span>
+          
+          <div class="scan-label">
+            <template v-if="scanProgress === 100">Access Granted</template>
+            <template v-else-if="isHapticScanning">Scanning Identity ({{ scanProgress }}%)</template>
+            <template v-else>Hold to Initialize Haptic Scan</template>
+          </div>
         </div>
       </section>
     </div>
@@ -146,51 +217,84 @@ onMounted(() => {
 .block-title {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--text-secondary);
+  color: #888; /* Increased Contrast */
   letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-.data-display { min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+.data-display { min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+
+.status-box { display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+.status-box.error { color: #ff3366; }
+.error-detail { font-size: 0.8rem; color: #a0a0a0; font-family: var(--font-main); line-height: 1.5; }
 
 .data-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
-.label { font-family: var(--font-mono); font-size: 0.6rem; color: #444; }
-.value { font-family: var(--font-mono); font-size: 1.2rem; color: var(--text-primary); }
+.label { font-family: var(--font-mono); font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 0.1em; }
+.value { font-family: var(--font-mono); font-size: 1.3rem; color: var(--text-primary); }
 
 .status-msg {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #444;
-  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: #888;
 }
 
-.status-msg.loading { color: var(--accent-color); animation: pulse 2s infinite; }
+.status-msg.highlight { color: #ccc; }
+.status-msg.urgent { color: #ff3366; font-weight: bold; letter-spacing: 0.1em; }
+.status-msg.success { color: var(--accent-color); display: flex; align-items: center; gap: 0.5rem; }
 
-.badge {
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  color: var(--accent-color);
-  text-shadow: 0 0 15px var(--accent-glow);
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: pulse-dot 1.5s infinite;
 }
 
-.notification-status {
+@keyframes pulse-dot {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Redesigned Alert Counter */
+.alert-counter {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.counter-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  padding-bottom: 0.5rem;
+}
+
+.counter-value {
+  font-family: var(--font-mono);
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--accent-color);
+  text-shadow: 0 0 20px var(--accent-glow);
+  font-weight: bold;
 }
 
 .actions-row { display: flex; gap: 1rem; }
 
 :deep(.p-button) {
   background: transparent !important;
-  border: 1px solid #222 !important;
+  border: 1px solid #333 !important;
   border-radius: 0 !important;
-  color: var(--text-secondary) !important;
+  color: #aaa !important;
   font-family: var(--font-mono);
   font-size: 0.65rem !important;
   text-transform: uppercase;
@@ -205,42 +309,63 @@ onMounted(() => {
   box-shadow: 0 0 15px var(--accent-glow) !important;
 }
 
+.mini-btn { padding: 0.6rem 1.2rem !important; font-size: 0.65rem !important; border-color: #444 !important; color: #ccc !important; }
+.mini-btn.danger { border-color: #ff3366 !important; color: #ff3366 !important; }
+.mini-btn.danger:hover { background: rgba(255, 51, 102, 0.1) !important; box-shadow: 0 0 20px rgba(255, 51, 102, 0.3) !important; }
+
+/* Haptic Scanner Styling */
 .touch-zone {
-  height: 120px;
-  border: 1px solid #111;
+  height: 140px;
+  border: 1px solid #222;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #333;
+  font-size: 0.8rem;
+  color: #666;
   letter-spacing: 0.2em;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  user-select: none;
   transition: all 0.4s ease;
 }
 
-.touch-zone:hover { border-color: #333; color: #666; }
+.touch-zone:hover { border-color: #444; color: #aaa; }
+.touch-zone.scanning { border-color: var(--accent-color); color: var(--text-primary); }
+.touch-zone.complete { border-color: #42b883; color: #42b883; }
+
+.scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(0, 240, 255, 0.05);
+  transition: width 0.1s linear;
+}
+
+.touch-zone.complete .scan-overlay {
+  background: rgba(66, 184, 131, 0.1);
+  width: 100% !important;
+}
 
 .scanner-line {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 1px;
+  height: 2px;
   background: var(--accent-color);
-  box-shadow: 0 0 10px var(--accent-glow);
-  animation: scan 4s linear infinite;
-  opacity: 0.3;
+  box-shadow: 0 0 20px var(--accent-glow);
+  animation: scan-move 2s ease-in-out infinite;
+  z-index: 2;
 }
 
-@keyframes scan {
+@keyframes scan-move {
   0% { transform: translateY(0); }
-  100% { transform: translateY(120px); }
+  50% { transform: translateY(138px); }
+  100% { transform: translateY(0); }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
+.scan-label { z-index: 3; position: relative; }
 </style>

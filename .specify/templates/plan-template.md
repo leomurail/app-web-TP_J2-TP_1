@@ -31,7 +31,9 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **Principe I (Vue 3/Composition API)** : L'approche utilise-t-elle Vue 3 et `<script setup>` ?
+- [ ] **Principe II (Pédagogie/TP)** : La solution est-elle claire et suit-elle les consignes pédagogiques ?
+- [ ] **Principe III (Architecture SFC)** : La structure est-elle modulaire et conforme aux standards Vue ?
 
 ## Project Structure
 

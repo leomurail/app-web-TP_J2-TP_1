@@ -33,136 +33,201 @@ const submitForm = async () => {
 </script>
 
 <template>
-  <div class="form-container">
+  <div class="form-page">
     <header class="form-header">
-      <span class="step-indicator">STEP_0{{ formStore.currentStep + 1 }}</span>
-      <h2 class="title">Data_Entry</h2>
+      <div class="header-content">
+        <span class="step-tag">Protocol 0{{ formStore.currentStep + 1 }}</span>
+        <h2 class="title">Data Entry</h2>
+        <p class="subtitle">Secure multi-step synchronization of user identification and preferences.</p>
+      </div>
     </header>
     
-    <Stepper :value="(formStore.currentStep + 1).toString()">
-        <StepList class="custom-step-list">
-            <Step value="1">Identity</Step>
-            <Step value="2">Location</Step>
-            <Step value="3">Intel</Step>
-        </StepList>
-        <StepPanels>
-            <StepPanel v-slot="{ activateCallback }" value="1">
-                <div class="void-form">
-                    <div class="field">
-                        <label>User_Name</label>
-                        <InputText v-model="formStore.userData.name" placeholder="Enter identification..." />
-                    </div>
-                    <div class="field">
-                        <label>Secure_Email</label>
-                        <InputText v-model="formStore.userData.email" placeholder="alias@network.void" />
-                    </div>
-                </div>
-                <div class="actions">
-                    <Button label="Proceed" icon="pi pi-chevron-right" iconPos="right" @click="() => { formStore.currentStep = 1; activateCallback('2') }" />
-                </div>
-            </StepPanel>
-            
-            <StepPanel v-slot="{ activateCallback }" value="2">
-                <div class="void-form">
-                    <div class="field">
-                        <label>Physical_Address</label>
-                        <InputText v-model="formStore.userData.address" placeholder="Sector coordinate..." />
-                    </div>
-                    <div class="field">
-                        <label>Node_City</label>
-                        <InputText v-model="formStore.userData.city" placeholder="Urban cluster..." />
-                    </div>
-                </div>
-                <div class="actions">
-                    <Button label="Reverse" severity="secondary" icon="pi pi-chevron-left" @click="() => { formStore.currentStep = 0; activateCallback('1') }" />
-                    <Button label="Proceed" icon="pi pi-chevron-right" iconPos="right" @click="() => { formStore.currentStep = 2; activateCallback('3') }" />
-                </div>
-            </StepPanel>
-            
-            <StepPanel v-slot="{ activateCallback }" value="3">
-                <div class="void-form">
-                    <label class="section-label">Interest_Vectors</label>
-                    <div class="checkbox-group">
-                        <div class="check-item">
-                            <Checkbox v-model="formStore.userData.preferences" inputId="p1" value="Vue" />
-                            <label for="p1">CORE_VUE</label>
-                        </div>
-                        <div class="check-item">
-                            <Checkbox v-model="formStore.userData.preferences" inputId="p2" value="TS" />
-                            <label for="p2">TYPED_SCRIPT</label>
-                        </div>
-                        <div class="check-item">
-                            <Checkbox v-model="formStore.userData.preferences" inputId="p3" value="Design" />
-                            <label for="p3">VOID_AESTHETICS</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="actions">
-                    <Button label="Reverse" severity="secondary" icon="pi pi-chevron-left" @click="() => { formStore.currentStep = 1; activateCallback('2') }" />
-                    <Button label="Transmit" severity="success" icon="pi pi-bolt" iconPos="right" @click="submitForm" />
-                </div>
-            </StepPanel>
-        </StepPanels>
-    </Stepper>
+    <div class="form-wrapper">
+      <Stepper :value="(formStore.currentStep + 1).toString()">
+          <StepList class="void-stepper-list">
+              <Step value="1" class="void-step">Identity</Step>
+              <Step value="2" class="void-step">Location</Step>
+              <Step value="3" class="void-step">Intel</Step>
+          </StepList>
+          
+          <StepPanels class="void-panels">
+              <!-- Step 1: Identity -->
+              <StepPanel v-slot="{ activateCallback }" value="1">
+                  <div class="step-content">
+                      <div class="fields-group">
+                          <div class="field">
+                              <label>User Name</label>
+                              <InputText v-model="formStore.userData.name" placeholder="Enter identification code..." />
+                          </div>
+                          <div class="field">
+                              <label>Secure Email</label>
+                              <InputText v-model="formStore.userData.email" placeholder="alias@network.void" />
+                          </div>
+                      </div>
+                      <div class="actions justify-end">
+                          <Button label="Proceed" icon="pi pi-arrow-right" iconPos="right" @click="() => { formStore.currentStep = 1; activateCallback('2') }" />
+                      </div>
+                  </div>
+              </StepPanel>
+              
+              <!-- Step 2: Location -->
+              <StepPanel v-slot="{ activateCallback }" value="2">
+                  <div class="step-content">
+                      <div class="fields-group">
+                          <div class="field">
+                              <label>Physical Address</label>
+                              <InputText v-model="formStore.userData.address" placeholder="Sector coordinates..." />
+                          </div>
+                          <div class="field">
+                              <label>Node City</label>
+                              <InputText v-model="formStore.userData.city" placeholder="Urban cluster identification..." />
+                          </div>
+                      </div>
+                      <div class="actions">
+                          <Button label="Reverse" severity="secondary" @click="() => { formStore.currentStep = 0; activateCallback('1') }" />
+                          <Button label="Proceed" icon="pi pi-arrow-right" iconPos="right" @click="() => { formStore.currentStep = 2; activateCallback('3') }" />
+                      </div>
+                  </div>
+              </StepPanel>
+              
+              <!-- Step 3: Intel -->
+              <StepPanel v-slot="{ activateCallback }" value="3">
+                  <div class="step-content">
+                      <div class="fields-group">
+                          <label class="group-label">Interest Vectors</label>
+                          <div class="checkbox-grid">
+                              <div class="check-item" :class="{ selected: formStore.userData.preferences.includes('Vue') }">
+                                  <Checkbox v-model="formStore.userData.preferences" inputId="p1" value="Vue" />
+                                  <label for="p1">Core Vue Engine</label>
+                              </div>
+                              <div class="check-item" :class="{ selected: formStore.userData.preferences.includes('TS') }">
+                                  <Checkbox v-model="formStore.userData.preferences" inputId="p2" value="TS" />
+                                  <label for="p2">Typed Script Layer</label>
+                              </div>
+                              <div class="check-item" :class="{ selected: formStore.userData.preferences.includes('Design') }">
+                                  <Checkbox v-model="formStore.userData.preferences" inputId="p3" value="Design" />
+                                  <label for="p3">Void Aesthetics</label>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="actions">
+                          <Button label="Reverse" severity="secondary" @click="() => { formStore.currentStep = 1; activateCallback('2') }" />
+                          <Button label="Transmit Data" severity="success" icon="pi pi-bolt" iconPos="right" @click="submitForm" />
+                      </div>
+                  </div>
+              </StepPanel>
+          </StepPanels>
+      </Stepper>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.form-container {
-  max-width: 600px;
+.form-page {
+  max-width: 800px;
   margin: 0 auto;
+  padding: 2rem 0;
 }
 
 .form-header {
-  margin-bottom: 4rem;
+  margin-bottom: 5rem;
+  border-left: 1px solid var(--accent-color);
+  padding-left: 2rem;
 }
 
-.step-indicator {
+.step-tag {
   font-family: var(--font-mono);
   color: var(--accent-color);
   font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
 }
 
 .title {
-  font-size: 3rem;
-  margin-top: 0.5rem;
+  font-size: 4rem;
+  margin: 0.5rem 0;
   color: var(--text-primary);
+  text-transform: uppercase;
 }
 
-/* PrimeVue Overrides */
-:deep(.p-stepper) {
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* Stepper Customization - REMOVED GREY BOX */
+.form-wrapper {
   background: transparent;
+  border: none;
+  padding: 0;
+  position: relative;
 }
 
-:deep(.p-stepper-nav) {
-  display: none; /* Hide default nav, we have our indicator */
+:deep(.p-stepper) {
+  background: transparent !important;
+}
+
+:deep(.void-stepper-list) {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5rem;
+  border-bottom: 1px solid #111;
+  padding-bottom: 1.5rem;
+  background: transparent !important;
+}
+
+:deep(.void-step) {
+  background: transparent !important;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #333 !important;
+  padding: 0 !important;
+  flex: 1;
+}
+
+:deep(.p-stepper-action) {
+    background: transparent !important;
+    padding: 0 !important;
 }
 
 :deep(.p-stepper-panels) {
-  background: transparent;
-  padding: 0;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
-.void-form {
+:deep(.p-stepper-panel) {
+  background: transparent !important;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.fields-group {
   display: flex;
   flex-direction: column;
   gap: 3rem;
-  margin-bottom: 4rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
-.field label, .section-label {
+.field label, .group-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-secondary);
+  font-size: 0.6rem;
+  color: #444;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.3em;
 }
 
 :deep(.p-inputtext) {
@@ -171,65 +236,62 @@ const submitForm = async () => {
   border-bottom: 1px solid #222 !important;
   border-radius: 0 !important;
   color: white !important;
-  font-size: 1.4rem !important;
-  padding: 0.8rem 0 !important;
+  font-size: 1.6rem !important;
+  padding: 1rem 0 !important;
   font-family: var(--font-main);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :deep(.p-inputtext:focus) {
   border-bottom-color: var(--accent-color) !important;
-  box-shadow: 0 4px 20px -4px var(--accent-glow) !important;
 }
 
 :deep(.p-inputtext::placeholder) {
-  color: #333;
-  font-size: 1rem;
+  color: #222;
+  font-size: 1.1rem;
 }
 
-.checkbox-group {
+/* Checkbox Grid */
+.checkbox-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
 .check-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
-
-.check-item label {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #111;
+  transition: all 0.4s ease;
   cursor: pointer;
 }
 
-:deep(.p-checkbox .p-checkbox-box) {
-  background: transparent !important;
-  border: 1px solid #333 !important;
-  border-radius: 0 !important;
+.check-item.selected {
+  border-color: var(--accent-color);
+  background: rgba(0, 240, 255, 0.02);
 }
 
-:deep(.p-checkbox.p-checkbox-checked .p-checkbox-box) {
-  border-color: var(--accent-color) !important;
-  background: var(--accent-color) !important;
-}
-
+/* Actions */
 .actions {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 2rem;
+  margin-top: 2rem;
 }
+
+.justify-end { justify-content: flex-end; }
 
 :deep(.p-button) {
   background: transparent !important;
   border: 1px solid #222 !important;
   border-radius: 0 !important;
   color: white !important;
-  padding: 1rem 2rem !important;
-  font-size: 0.7rem !important;
+  padding: 1.2rem 3rem !important;
+  font-size: 0.75rem !important;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.3em;
   font-family: var(--font-mono);
   transition: all 0.4s ease;
 }
@@ -237,15 +299,11 @@ const submitForm = async () => {
 :deep(.p-button:hover) {
   border-color: var(--accent-color) !important;
   color: var(--accent-color) !important;
-  box-shadow: 0 0 20px var(--accent-glow) !important;
+  box-shadow: 0 0 30px var(--accent-glow) !important;
 }
 
-:deep(.p-button-secondary) {
-  opacity: 0.5;
-}
-
-:deep(.p-button-success) {
-  border-color: var(--accent-color) !important;
-  color: var(--accent-color) !important;
+@media (max-width: 768px) {
+  .title { font-size: 2.5rem; }
+  .void-stepper-list { flex-direction: column; gap: 1rem; }
 }
 </style>
