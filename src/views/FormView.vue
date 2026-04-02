@@ -130,7 +130,7 @@ const submitForm = async () => {
 }
 
 .form-header {
-  margin-bottom: 5rem;
+  margin-bottom: var(--app-padding-y);
   border-left: 1px solid var(--accent-color);
   padding-left: 2rem;
 }
@@ -144,7 +144,7 @@ const submitForm = async () => {
 }
 
 .title {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 10vw, 4rem);
   margin: 0.5rem 0;
   color: var(--text-primary);
   text-transform: uppercase;
@@ -157,7 +157,7 @@ const submitForm = async () => {
   line-height: 1.6;
 }
 
-/* Stepper Customization - REMOVED GREY BOX */
+/* Stepper Customization */
 .form-wrapper {
   background: transparent;
   border: none;
@@ -172,10 +172,23 @@ const submitForm = async () => {
 :deep(.void-stepper-list) {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5rem;
+  margin-bottom: 3rem;
   border-bottom: 1px solid #111;
   padding-bottom: 1.5rem;
   background: transparent !important;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  :deep(.void-stepper-list) {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  :deep(.void-step) {
+    font-size: 0.55rem !important;
+    letter-spacing: 0.1em;
+  }
 }
 
 :deep(.void-step) {
@@ -194,26 +207,26 @@ const submitForm = async () => {
     padding: 0 !important;
 }
 
-:deep(.p-stepper-panels) {
+:deep(.p-steppanels) {
   background: transparent !important;
   padding: 0 !important;
   border: none !important;
 }
 
-:deep(.p-stepper-panel) {
+:deep(.p-steppanel) {
   background: transparent !important;
 }
 
 .step-content {
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 3rem;
 }
 
 .fields-group {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .field {
@@ -236,10 +249,11 @@ const submitForm = async () => {
   border-bottom: 1px solid #222 !important;
   border-radius: 0 !important;
   color: white !important;
-  font-size: 1.6rem !important;
+  font-size: clamp(1.2rem, 5vw, 1.6rem) !important;
   padding: 1rem 0 !important;
   font-family: var(--font-main);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
 }
 
 :deep(.p-inputtext:focus) {
@@ -277,8 +291,9 @@ const submitForm = async () => {
 .actions {
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
   margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
 .justify-end { justify-content: flex-end; }
@@ -288,7 +303,7 @@ const submitForm = async () => {
   border: 1px solid #222 !important;
   border-radius: 0 !important;
   color: white !important;
-  padding: 1.2rem 3rem !important;
+  padding: 1rem 2rem !important;
   font-size: 0.75rem !important;
   text-transform: uppercase;
   letter-spacing: 0.3em;
@@ -296,14 +311,17 @@ const submitForm = async () => {
   transition: all 0.4s ease;
 }
 
-:deep(.p-button:hover) {
-  border-color: var(--accent-color) !important;
-  color: var(--accent-color) !important;
-  box-shadow: 0 0 30px var(--accent-glow) !important;
-}
-
 @media (max-width: 768px) {
-  .title { font-size: 2.5rem; }
-  .void-stepper-list { flex-direction: column; gap: 1rem; }
+  .actions {
+    flex-direction: column;
+  }
+  
+  :deep(.p-button) {
+    width: 100%;
+  }
+
+  .form-header {
+    margin-bottom: 3rem;
+  }
 }
 </style>
