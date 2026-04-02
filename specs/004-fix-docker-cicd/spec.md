@@ -46,7 +46,7 @@ As a security administrator, I want the production application to be exposed thr
 
 **Acceptance Scenarios**:
 
-Given the production environment is deployed, **When** accessing the application via its defined Host rule (e.g., `app-web.fr`), **Then** Traefik should correctly route the traffic to the internal port 3060.
+Given the production environment is deployed, **When** accessing the application via its defined Host rule (e.g., `app-web.fr`), **Then** Traefik should correctly route the traffic to the internal port 3000.
 
 
 ---

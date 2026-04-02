@@ -32,7 +32,7 @@ L'utilisation du **Taskfile** remplace avantageusement un Makefile pour la gesti
    ```bash
    task watch
    ```
-   L'application sera accessible sur `http://localhost:3060`.
+   L'application sera accessible sur `http://localhost:3000`.
 
 3. **Nettoyer les conteneurs et les volumes orphelins** :
    ```bash
