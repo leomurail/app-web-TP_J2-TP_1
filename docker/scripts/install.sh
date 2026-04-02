@@ -6,5 +6,9 @@ if [ ! -f .env ]; then
   cp docker/env/.env.$ENV.template .env
   echo ".env created from $ENV template"
 fi
-docker-compose up -d --build
+if command -v docker-compose &> /dev/null; then
+  docker-compose up -d --build
+else
+  docker compose up -d --build
+fi
 npm install
