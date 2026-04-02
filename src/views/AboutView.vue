@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <span class="meta">SYSTEM_MANIFESTO</span>
-    <h2 class="title">About_The_Void</h2>
+    <h2 class="title">About the void</h2>
     <div class="content">
       <p>This interface is a manifestation of surgical minimalism. Every pixel serves a purpose, every interaction is a signal through the noise.</p>
       <p>Designed for the next generation of web applications where clarity and performance are paramount.</p>
@@ -33,8 +33,10 @@
 }
 
 .title {
-  font-size: 4rem;
-  margin: 1rem 0 4rem;
+  font-size: var(--font-size-section-title);
+  margin: 1rem 0 3rem;
+  line-height: 1.1;
+  word-break: break-word;
 }
 
 .content {

@@ -112,7 +112,7 @@
   min-height: 80vh;
   display: flex;
   align-items: center;
-  padding: 4rem 0;
+  padding: var(--app-padding-y) 0;
   border-bottom: 1px solid #111;
 }
 
@@ -133,12 +133,6 @@
 .hero {
   min-height: 90vh;
   position: relative;
-}
-
-.hero-title {
-  font-size: 7rem;
-  line-height: 0.85;
-  margin-bottom: 2rem;
 }
 
 .hero-subtitle {
@@ -162,6 +156,8 @@
   letter-spacing: 0.2em;
   text-decoration: none;
   transition: all 0.4s ease;
+  display: inline-block;
+  text-align: center;
 }
 
 .void-btn.primary {
@@ -193,16 +189,11 @@
 }
 
 /* Noise Section */
-.section-title {
-  font-size: 4rem;
-  margin-bottom: 4rem;
-}
-
 .dim { color: #333; }
 
 .grid-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 4rem;
 }
 
@@ -220,7 +211,7 @@
 /* Features Section */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
 }
 
@@ -262,7 +253,7 @@
 /* Manifesto Section */
 .manifesto-card {
   border: 1px solid #111;
-  padding: 5rem;
+  padding: clamp(2rem, 5vw, 5rem);
 }
 
 .spec-list {
@@ -284,17 +275,17 @@
 /* CTA Section */
 .cta { border-bottom: none; min-height: 60vh; }
 .text-center { text-align: center; }
-.final-title { font-size: 5rem; margin-bottom: 1rem; }
 .final-desc { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 4rem; }
 
 .big-void-btn {
   font-family: var(--font-mono);
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 4vw, 1.5rem);
   color: var(--text-primary);
   text-decoration: none;
   border: 1px solid #222;
-  padding: 2rem 4rem;
+  padding: 1.5rem 3rem;
   transition: all 0.5s ease;
+  display: inline-block;
 }
 
 .big-void-btn:hover {
@@ -309,6 +300,8 @@
   display: flex;
   justify-content: space-between;
   border-top: 1px solid #111;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .f-text {
@@ -324,10 +317,22 @@
   50% { transform: translateY(-10px); }
 }
 
-@media (max-width: 1024px) {
-  .hero-title { font-size: 5rem; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
-  .hero-actions { flex-direction: column; }
+@media (max-width: 768px) {
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .void-btn {
+    width: 100%;
+  }
+
+  .accent-border {
+    padding-left: 1.5rem;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
 }
 </style>

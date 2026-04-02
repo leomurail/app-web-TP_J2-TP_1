@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import MobileMenu from './MobileMenu.vue'
 
 const route = useRoute()
+const isMobileMenuOpen = ref(false)
 
 const links = [
   { name: 'home', label: 'Home', path: '/' },
@@ -13,12 +16,18 @@ const links = [
 const isActive = (path: string) => {
   return route.path === path
 }
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
 </script>
 
 <template>
   <nav class="navbar">
     <div class="navbar-brand">V_VOID</div>
-    <div class="navbar-links">
+    
+    <!-- Desktop Links -->
+    <div class="navbar-links hide-mobile">
       <router-link
         v-for="link in links"
         :key="link.name"
@@ -29,6 +38,19 @@ const isActive = (path: string) => {
         {{ link.label }}
       </router-link>
     </div>
+
+    <!-- Hamburger Toggle -->
+    <button class="hamburger-toggle hide-desktop" @click="toggleMobileMenu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <MobileMenu 
+      v-if="isMobileMenuOpen" 
+      :is-open="isMobileMenuOpen" 
+      :links="links" 
+      @close="isMobileMenuOpen = false" 
+    />
   </nav>
 </template>
 
@@ -42,7 +64,7 @@ const isActive = (path: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 3rem;
+  padding: 1.5rem var(--app-padding-x);
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid #111;
@@ -97,5 +119,29 @@ const isActive = (path: string) => {
 
 .nav-link.active::after {
   width: 100%;
+}
+
+.hamburger-toggle {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background-color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 1rem var(--app-padding-x);
+  }
 }
 </style>
