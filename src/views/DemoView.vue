@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGeolocation, useShare, usePermission } from '@vueuse/core'
+import { useGeolocation, useShare } from '@vueuse/core'
 import { useDeviceStore } from '@/stores/device'
 import Button from 'primevue/button'
 import api from '@/services/api'
