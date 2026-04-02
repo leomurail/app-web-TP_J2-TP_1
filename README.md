@@ -17,24 +17,26 @@ Ce projet est une application Vue 3 moderne développée dans le cadre d'un TP. 
 - **State Management** : Pinia.
 - **Routing** : Vue Router.
 - **Tooling** : Vite, Vitest.
-- **DevOps** : Docker, GitHub Actions.
+- **DevOps** : Docker, Taskfile, GitHub Actions.
 
-## 📦 Installation (Getting Started)
+## 📦 Installation & Orchestration (Taskfile)
 
-1. **Cloner le projet** :
+L'utilisation du **Taskfile** remplace avantageusement un Makefile pour la gestion locale et CI/CD.
+
+1. **Initialiser l'environnement** (copie du .env, montage des conteneurs, npm install) :
    ```bash
-   git clone <repo-url>
-   cd vue-app
+   task install
    ```
 
-2. **Installer les dépendances** :
+2. **Lancer le mode développement avec hot-reloading** :
    ```bash
-   npm install
+   task watch
    ```
+   L'application sera accessible sur `http://localhost:3060`.
 
-3. **Lancer le serveur de développement** :
+3. **Nettoyer les conteneurs et les volumes orphelins** :
    ```bash
-   npm run dev
+   task clean
    ```
 
 4. **Lancer les tests** :
@@ -42,47 +44,39 @@ Ce projet est une application Vue 3 moderne développée dans le cadre d'un TP. 
    npm test
    ```
 
-## 🔌 Backend Setup (Demo Page)
+## 🐳 Docker & Environnements
 
-La page **Démo** (`/demo`) interagit avec une API externe pour les alertes système.
+L'application utilise une structure de **Docker Compose étendue** pour séparer les configurations par environnement.
 
-1. **API Locale** : L'application s'attend à une API tournant sur `http://localhost:3000/api/v1`.
-2. **Proxy Vite** : En développement, Vite redirige les appels de `/api` vers le port 3000 pour éviter les erreurs CORS.
-3. **Endpoints requis** :
-   - `GET /api/v1/alerts` : Doit retourner `{ "count": number }`.
+- **`docker-compose.yaml` (Base)** : Définit le service `app` et les variables communes.
+- **`docker/docker-compose.local.yaml` (Local)** : Expose les ports localement et monte les volumes pour le développement.
+- **`docker/docker-compose.prod.yaml` (Production)** : Configure les labels **Traefik** pour le routage dynamique et la sécurité (non-root user).
 
-Si le backend n'est pas disponible, l'interface affichera un message d'erreur gracieux sans bloquer l'application.
-
-## 🐳 Docker
-
-L'application peut être conteneurisée pour le développement ou la production.
-
-- **Lancer avec Docker Compose** :
-  ```bash
-  docker-compose up --build
-  ```
-  L'application sera accessible sur `http://localhost:8080`.
-
-- **Structure Docker** :
-  - `Dockerfile` : Utilise un build multi-étapes (Node.js pour le build, Nginx pour le service).
-  - `docker-compose.yml` : Gère le service web et le mappage des ports.
+### Gestion des Environnements (ENV)
+La gestion est basée sur des templates dans `docker/env/` :
+- `.env.local.template` : Configuration de développement local.
+- `.env.dev.template` : Configuration pour le serveur de développement.
+- `.env.prod.template` : Configuration pour la production réelle.
 
 ## 🚢 Déploiement (CI/CD)
 
-Le déploiement est entièrement automatisé via **GitHub Actions** (`.github/workflows/deploy.yml`).
+Le déploiement est entièrement automatisé via **GitHub Actions**.
 
-- **Processus** :
-  1. À chaque push sur `main`, les tests sont lancés.
-  2. Si les tests passent, le projet est buildé (`npm run build`).
-  3. Les fichiers générés dans `dist/` sont déployés sur le VPS via SSH (SCP).
-- **Configuration Requise** :
-  - Les secrets GitHub (`VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`) doivent être configurés dans le dépôt.
+- **Branches & Workflows** :
+  - `push` sur `develop` → `.github/workflows/dev-deploy.yml` (Déploiement Dev).
+  APP_DOMAIN=dev.app-web.fr
+    - `push` on `main` → `.github/workflows/prod-deploy.yml` (Déploiement Prod).
+  - **Processus** :
+    1. Initialisation de l'environnement via `task install`.
+    2. Déploiement des fichiers via `rsync` (SSH).
+  - **Configuration Requise** :
+    - Secrets GitHub : `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `APP_NAME`.
 
 ## 📋 Processus de Développement (Speckit)
 
 Le projet suit le workflow **Speckit** situé dans le dossier `.specify/` :
-- **Spécifications** : `specs/001-vue-tp-complete-app/spec.md`
-- **Plan Technique** : `specs/001-vue-tp-complete-app/plan.md`
-- **Liste des Tâches** : `specs/001-vue-tp-complete-app/tasks.md`
+- **Spécifications** : `specs/004-fix-docker-cicd/spec.md`
+- **Plan Technique** : `specs/004-fix-docker-cicd/plan.md`
+- **Liste des Tâches** : `specs/004-fix-docker-cicd/tasks.md`
 
 Toutes les modifications respectent la **Constitution** du projet définie dans `.specify/memory/constitution.md`.
