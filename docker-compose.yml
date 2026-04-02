@@ -1,7 +1,19 @@
 version: '3.8'
+
 services:
-  web:
-    build: .
-    ports:
-      - "8080:80"
-    restart: always
+  app:
+    container_name: ${APP_NAME}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${NODE_ENV}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - APP_NAME=${APP_NAME}
+      - APP_PORT=${APP_PORT}
+    networks:
+      - internal-net
+
+networks:
+  internal-net:
+    driver: bridge

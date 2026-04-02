@@ -1,0 +1,38 @@
+version: '3'
+
+vars:
+  APP_ENV: 
+    sh: echo ${APP_ENV:-local}
+  COMPOSE_CMD:
+    sh: |
+      if [ "{{.APP_ENV}}" == "local" ]; then
+        echo "docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml"
+      else
+        echo "docker-compose -f docker-compose.yml -f docker/docker-compose.prod.yaml"
+      fi
+
+tasks:
+  install:
+    desc: Initialise l'environnement
+    cmds:
+      - ./docker/scripts/install.sh {{.APP_ENV}}
+
+  watch:
+    desc: Lance le mode développement avec hot-reloading
+    cmds:
+      - "{{.COMPOSE_CMD}} up --build"
+
+  clean:
+    desc: Nettoie les conteneurs et les volumes orphelins
+    cmds:
+      - ./docker/scripts/destroy.sh
+
+  up:
+    desc: Lance l'environnement (détaché)
+    cmds:
+      - "{{.COMPOSE_CMD}} up -d"
+
+  down:
+    desc: Arrête l'environnement
+    cmds:
+      - "{{.COMPOSE_CMD}} down"
