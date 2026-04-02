@@ -6,6 +6,7 @@ if [ ! -f .env ]; then
   cp docker/env/.env.$ENV.template .env
   echo ".env created from $ENV template"
 fi
+
 task up
 
 # NPM install only for local development

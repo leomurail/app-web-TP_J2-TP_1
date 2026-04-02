@@ -1,3 +1,9 @@
 #!/bin/bash
 echo "Destroying environment..."
-docker-compose down -v --remove-orphans
+set -e
+
+task clean
+
+rm -rf node_modules
+
+rm .env
