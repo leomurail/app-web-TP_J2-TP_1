@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     networks:
-      - traefik-net
+      - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`${APP_DOMAIN}`)"
