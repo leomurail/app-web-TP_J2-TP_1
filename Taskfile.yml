@@ -22,10 +22,15 @@ tasks:
     cmds:
       - "{{.COMPOSE_CMD}} up --build"
 
-  clean:
+  destroy:
     desc: Nettoie les conteneurs et les volumes orphelins
     cmds:
       - ./docker/scripts/destroy.sh
+
+  clean:
+    desc: Nettoie les conteneurs et les volumes orphelins
+    cmds:
+      - "{{.COMPOSE_CMD}} down --rmi all -v"
 
   up:
     desc: Lance l'environnement (détaché)

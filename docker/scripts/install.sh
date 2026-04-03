@@ -11,6 +11,7 @@ if [ ! -f .env ]; then
 fi
 
 # Delegate the Docker launch to Task to reuse the COMPOSE_CMD logic
+task build
 task up
 
 # NPM install only for local development
