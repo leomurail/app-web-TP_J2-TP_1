@@ -17,6 +17,11 @@ tasks:
     cmds:
       - ./docker/scripts/install.sh {{.APP_ENV}}
 
+  build:
+    desc: Build les images docker
+    cmds:
+      - "{{.COMPOSE_CMD}} build"
+
   watch:
     desc: Lance le mode développement avec hot-reloading
     cmds:
