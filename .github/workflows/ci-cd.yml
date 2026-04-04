@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  test:
+    name: Unit & Component Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run tests
+        run: npm run test
+
+  deploy:
+    name: Deployment
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine Environment
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "target=prod" >> $GITHUB_OUTPUT
+          else
+            echo "target=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create destination directory
+        run: mkdir -p ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
+
+      - name: Sync files
+        run: |
+          rsync -avz --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            ./ ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
+
+      - name: Initialize Environment
+        run: |
+          cd ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
+          task install
+        env:
+          APP_ENV: ${{ steps.env.outputs.target }}
