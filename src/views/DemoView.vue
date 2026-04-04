@@ -333,7 +333,7 @@ onMounted(() => {
   box-shadow: 0 0 15px var(--accent-glow) !important;
 }
 
-.mini-btn { padding: 0.6rem 1.2rem !important; font-size: 0.65rem !important; border-color: #444 !important; color: #ccc !important; }
+.mini-btn { padding: 0.6rem 1.2rem !important; font-size: 0.65rem !important; border-color: #888 !important; color: #ccc !important; }
 .mini-btn.danger { border-color: #ff3366 !important; color: #ff3366 !important; }
 .mini-btn.danger:hover { background: rgba(255, 51, 102, 0.1) !important; box-shadow: 0 0 20px rgba(255, 51, 102, 0.3) !important; }
 
@@ -355,7 +355,7 @@ onMounted(() => {
   transition: all 0.4s ease;
 }
 
-.touch-zone:hover { border-color: #444; color: #aaa; }
+.touch-zone:hover { border-color: #888; color: #aaa; }
 .touch-zone.scanning { border-color: var(--accent-color); color: var(--text-primary); }
 .touch-zone.complete { border-color: #42b883; color: #42b883; }
 

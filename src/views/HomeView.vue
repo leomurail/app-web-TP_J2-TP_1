@@ -269,7 +269,7 @@
   padding-bottom: 1rem;
 }
 
-.s-label { font-family: var(--font-mono); font-size: 0.7rem; color: #444; }
+.s-label { font-family: var(--font-mono); font-size: 0.7rem; color: #888; }
 .s-val { font-family: var(--font-mono); font-size: 1rem; color: var(--text-primary); }
 
 /* CTA Section */
