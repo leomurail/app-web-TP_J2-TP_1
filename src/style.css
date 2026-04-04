@@ -4,7 +4,8 @@
   --bg-color: #000000;
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
-  --accent-color: #00f0ff; /* Electric Cyan */
+  --accent-color: #00f0ff;
+  /* Electric Cyan */
   --accent-glow: rgba(0, 240, 255, 0.4);
   --border-color: #1a1a1a;
   --font-main: 'Inter', system-ui, -apple-system, sans-serif;
@@ -47,6 +48,7 @@ h2 {
   letter-spacing: -0.05em;
   font-weight: 700;
   text-transform: uppercase;
+  margin-bottom: 25px;
 }
 
 h3 {
