@@ -69,7 +69,7 @@ p {
 .spec-label {
   font-family: var(--font-mono);
   font-size: 0.6rem;
-  color: #444;
+  color: #888;
 }
 
 .spec-value {

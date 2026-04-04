@@ -238,7 +238,7 @@ const submitForm = async () => {
 .field label, .group-label {
   font-family: var(--font-mono);
   font-size: 0.6rem;
-  color: #444;
+  color: #888;
   text-transform: uppercase;
   letter-spacing: 0.3em;
 }
