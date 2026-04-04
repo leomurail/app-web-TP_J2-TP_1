@@ -13,3 +13,4 @@ dist/
 # Misc
 .DS_Store
 Thumbs.db
+coverage/
