@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import NavBar from '@/components/NavBar.vue'
+import Toast from 'primevue/toast'
 </script>
 
 <template>
   <div class="app-container">
+    <Toast position="bottom-right" />
     <NavBar />
     <main class="main-content">
       <router-view v-slot="{ Component }">
