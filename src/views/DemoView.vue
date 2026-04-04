@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useGeolocation, useShare } from '@vueuse/core'
 import { useDeviceStore } from '@/stores/device'
+import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import api from '@/services/api'
 import { onMounted, ref } from 'vue'
 
 const deviceStore = useDeviceStore()
+const toast = useToast()
 const { coords, locatedAt, resume, error: geoError } = useGeolocation()
 const { share, isSupported: isShareSupported } = useShare()
 
@@ -48,14 +50,25 @@ const resetGeoProtocol = () => {
 }
 
 const sendNotification = () => {
+  // PrimeVue In-App Toast
+  toast.add({
+    severity: 'info',
+    summary: 'Signal Broadcast',
+    detail: 'System signal sent successfully to the grid.',
+    life: 3000,
+  })
+
+  // Counter always increments
+  deviceStore.incrementNotifications()
+
+  // Native Browser Notification
   if ('Notification' in window) {
-    Notification.requestPermission().then(permission => {
+    Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
         new Notification('Void Alert', {
           body: 'System synchronization successful.',
-          icon: '/favicon.svg'
+          icon: '/favicon.svg',
         })
-        deviceStore.incrementNotifications()
       }
     })
   }

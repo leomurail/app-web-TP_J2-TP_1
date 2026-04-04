@@ -1,9 +1,9 @@
 # vue-app Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-02
+Auto-generated from all feature plans. Last updated: 2026-04-04
 
 ## Active Technologies
-- Vue 3 (Composition API), TypeScript 5.9 + Axios, VueUse, PrimeVue, Pinia (003-fix-demo-page-errors)
+- Vue 3 (Composition API), TypeScript 5.9 + Axios, VueUse, PrimeVue (Toast), Pinia (005-notification-system)
 - N/A (Transient state in Pinia store) (003-fix-demo-page-errors)
 - Vue 3, TypeScript, Node.js 20+ + Docker, Docker Compose, Go-Task (004-fix-docker-cicd)
 
@@ -26,6 +26,7 @@ npm test && npm run lint
 TypeScript 5.x, Vue 3.x: Follow standard conventions
 
 ## Recent Changes
+- 005-notification-system: Integrated PrimeVue Toast for in-app feedback and Browser Notification API.
 - 004-fix-docker-cicd: Added Vue 3, TypeScript, Node.js 20+ + Docker, Docker Compose, Go-Task
 - 003-fix-demo-page-errors: Added Vue 3 (Composition API), TypeScript 5.9 + Axios, VueUse, PrimeVue, Pinia
 - 002-app-responsive-redesign: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
