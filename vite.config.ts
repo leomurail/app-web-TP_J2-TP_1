@@ -13,6 +13,7 @@ export default defineConfig({
   server: {
     host: true,
     port: Number(process.env.APP_PORT) || 3000,
+    allowedHosts: ['dev.app-web.leomurail.fr'],
     proxy: {
       '/api': {
         target: `http://localhost:${process.env.APP_PORT || 3000}`,
