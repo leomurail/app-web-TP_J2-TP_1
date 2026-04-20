@@ -53,9 +53,10 @@ jobs:
             --exclude '.github' \
             ./ ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
 
-      - name: Initialize Environment
+      - name: Deploy Environment to Swarm (via task install)
         run: |
           cd ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
           task install
         env:
           APP_ENV: ${{ steps.env.outputs.target }}
+
