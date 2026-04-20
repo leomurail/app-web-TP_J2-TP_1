@@ -1,66 +1,51 @@
 version: '3'
 
 dotenv: ['.env']
-vars:
-  APP_ENV: 
-    sh: echo ${APP_ENV:-local}
-  COMPOSE_CMD:
-    sh: |
-      if [ "{{.APP_ENV}}" == "local" ]; then
-        echo "docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml"
-      else
-        echo "docker compose -f docker-compose.yml -f docker/docker-compose.prod.yaml"
-      fi
 
 tasks:
   install:
     desc: Initialise l'environnement
     cmds:
-      - ./docker/scripts/install.sh {{.APP_ENV}}
+      - ./docker/scripts/install.sh $APP_ENV
 
   build:
-    desc: Build les images docker
+    desc: Build l'image
     cmds:
-      - "{{.COMPOSE_CMD}} build"
+      - docker-compose build
 
   watch:
-    desc: Lance le mode développement avec hot-reloading
+    desc: Mode dev interactif
     cmds:
-      - "{{.COMPOSE_CMD}} up --build"
-
-  destroy:
-    desc: Nettoie les conteneurs et les volumes orphelins
-    cmds:
-      - ./docker/scripts/destroy.sh
-
-  clean:
-    desc: Nettoie les conteneurs et les volumes orphelins
-    cmds:
-      - "{{.COMPOSE_CMD}} down --rmi all -v"
+      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml up --build
 
   up:
-    desc: Lance l'environnement (détaché)
+    desc: Lance l'environnement local
     cmds:
-      - "{{.COMPOSE_CMD}} up -d"
+      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml up -d
 
   down:
-    desc: Arrête l'environnement
+    desc: Arrête l'environnement local
     cmds:
-      - "{{.COMPOSE_CMD}} down"
+      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml down
 
   deploy:
-    desc: Déploie la stack Docker Swarm
+    desc: Clean & Deploy Swarm
     cmds:
-      - task: build
-      - docker network inspect traefik-net >/dev/null 2>&1 || docker network create --driver overlay --attachable traefik-net || true
-      - "{{.COMPOSE_CMD}} config | docker stack deploy -c - $APP_NAME"
+      - docker stack rm $APP_NAME || true
+      - docker-compose build
+      - docker-compose -f docker-compose.yml -f docker/docker-compose.prod.yaml config | grep -v '^name:' | docker stack deploy -c - $APP_NAME
+
+  status:
+    desc: Statut des services Swarm
+    cmds:
+      - docker stack services $APP_NAME
 
   remove:
-    desc: Arrête et supprime la stack Docker Swarm
+    desc: Supprime la stack Swarm
     cmds:
       - docker stack rm $APP_NAME
 
-  status:
-    desc: Vérifie le statut des services Swarm
+  clean:
+    desc: Nettoie tout (images & volumes)
     cmds:
-      - docker stack services $APP_NAME
+      - docker-compose down --rmi all -v
