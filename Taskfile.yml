@@ -31,6 +31,7 @@ tasks:
   deploy:
     desc: Deploy Swarm Stack
     cmds:
+      - docker network rm ${APP_NAME}_internal-net || true
       - docker stack deploy -c docker-compose.yml -c docker/docker-compose.prod.yaml $APP_NAME
 
   status:
