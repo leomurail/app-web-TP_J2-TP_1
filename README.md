@@ -39,18 +39,30 @@ L'utilisation du **Taskfile** remplace avantageusement un Makefile pour la gesti
    task clean
    ```
 
-4. **Lancer les tests** :
+4. **Déployer vers Docker Swarm** :
+   ```bash
+   task deploy
+   ```
+
+5. **Gérer la stack Swarm** :
+   ```bash
+   task status  # Vérifier l'état
+   task remove  # Supprimer le déploiement
+   ```
+
+6. **Lancer les tests** :
    ```bash
    npm test
    ```
 
-## 🐳 Docker & Environnements
+## 🐳 Docker, Swarm & Environnements
 
 L'application utilise une structure de **Docker Compose étendue** pour séparer les configurations par environnement.
 
-- **`docker-compose.yaml` (Base)** : Définit le service `app` et les variables communes.
-- **`docker/docker-compose.local.yaml` (Local)** : Expose les ports localement et monte les volumes pour le développement.
-- **`docker/docker-compose.prod.yaml` (Production)** : Configure les labels **Traefik** pour le routage dynamique et la sécurité (non-root user).
+- **`docker-compose.yaml` (Base)** : Définit l'image de base et le réseau `overlay` pour la compatibilité Swarm.
+- **`docker/docker-compose.local.yaml` (Local)** : Expose les ports localement et monte les volumes pour le mode interactif.
+- **`docker/docker-compose.prod.yaml` (Production/Dev)** : Configuré pour un déploiement d'orchestration via un bloc `deploy` incluant les labels de routage statique et dynamique vers **Traefik**.
+
 
 ### Gestion des Environnements (ENV)
 La gestion est basée sur des templates dans `docker/env/` :
@@ -63,14 +75,15 @@ La gestion est basée sur des templates dans `docker/env/` :
 Le déploiement est entièrement automatisé via **GitHub Actions**.
 
 - **Branches & Workflows** :
-  - `push` sur `develop` → `.github/workflows/dev-deploy.yml` (Déploiement Dev).
-  APP_DOMAIN=dev.app-web.fr
-    - `push` on `main` → `.github/workflows/prod-deploy.yml` (Déploiement Prod).
+  - `push` sur `dev` ou `main` → `.github/workflows/ci-cd.yml`.
   - **Processus** :
-    1. Initialisation de l'environnement via `task install`.
-    2. Déploiement des fichiers via `rsync` (SSH).
-  - **Configuration Requise** :
-    - Secrets GitHub : `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `APP_NAME`.
+    1. Tests CI automatisés (unitaires et de composants).
+    2. Détermination dynamique de l'environnement ciblé.
+    3. Transfert vers le serveur self-hosted via `rsync` (SSH).
+    4. Création des variables locales (`.env`) puis déclenchement natif de `task deploy` (Docker Swarm / Stack Compose).
+  - **Configuration Requise** (Secrets) :
+    - `SSH_PATH` (dossier final côté Node Swarm).
+
 
 ## 📋 Processus de Développement (Speckit)
 
