@@ -11,29 +11,28 @@ tasks:
   build:
     desc: Build l'image
     cmds:
-      - docker-compose build
+      - docker compose build
 
   watch:
     desc: Mode dev interactif
     cmds:
-      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml up --build
+      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml up --build
 
   up:
     desc: Lance l'environnement local
     cmds:
-      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml up -d
+      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml up -d
 
   down:
     desc: Arrête l'environnement local
     cmds:
-      - docker-compose -f docker-compose.yml -f docker/docker-compose.local.yaml down
+      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml down
 
   deploy:
-    desc: Clean & Deploy Swarm
+    desc: Deploy Swarm Stack
     cmds:
       - docker stack rm $APP_NAME || true
-      - docker-compose build
-      - docker-compose -f docker-compose.yml -f docker/docker-compose.prod.yaml config | grep -v '^name:' | docker stack deploy -c - $APP_NAME
+      - docker stack deploy -c docker-compose.yml -c docker/docker-compose.prod.yaml $APP_NAME
 
   status:
     desc: Statut des services Swarm
@@ -48,4 +47,4 @@ tasks:
   clean:
     desc: Nettoie tout (images & volumes)
     cmds:
-      - docker-compose down --rmi all -v
+      - docker compose down --rmi all -v
