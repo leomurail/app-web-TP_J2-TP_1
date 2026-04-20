@@ -31,7 +31,6 @@ tasks:
   deploy:
     desc: Deploy Swarm Stack
     cmds:
-      - docker stack rm $APP_NAME || true
       - docker stack deploy -c docker-compose.yml -c docker/docker-compose.prod.yaml $APP_NAME
 
   status:
