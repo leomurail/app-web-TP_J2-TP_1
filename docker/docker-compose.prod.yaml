@@ -4,14 +4,18 @@ services:
   app:
     networks:
       - proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
-      - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.${APP_NAME}.tls=true"
-      - "traefik.http.routers.${APP_NAME}.tls.certresolver=le"
-      - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
+        - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
+        - "traefik.http.routers.${APP_NAME}.tls=true"
+        - "traefik.http.routers.${APP_NAME}.tls.certresolver=le"
+        - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
 
 networks:
   proxy:
-    name: proxy
+    name: traefik-net
+    external: true

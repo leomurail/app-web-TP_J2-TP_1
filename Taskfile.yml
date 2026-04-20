@@ -1,5 +1,6 @@
 version: '3'
 
+dotenv: ['.env']
 vars:
   APP_ENV: 
     sh: echo ${APP_ENV:-local}
@@ -46,3 +47,20 @@ tasks:
     desc: Arrête l'environnement
     cmds:
       - "{{.COMPOSE_CMD}} down"
+
+  deploy:
+    desc: Déploie la stack Docker Swarm
+    cmds:
+      - task: build
+      - docker network inspect traefik-net >/dev/null 2>&1 || docker network create --driver overlay --attachable traefik-net || true
+      - "{{.COMPOSE_CMD}} config | docker stack deploy -c - $APP_NAME"
+
+  remove:
+    desc: Arrête et supprime la stack Docker Swarm
+    cmds:
+      - docker stack rm $APP_NAME
+
+  status:
+    desc: Vérifie le statut des services Swarm
+    cmds:
+      - docker stack services $APP_NAME
