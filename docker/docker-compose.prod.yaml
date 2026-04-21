@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   app:
     networks:
-      - proxy
+      - traefik_proxy
     deploy:
       mode: replicated
       replicas: 1
@@ -12,10 +10,9 @@ services:
         - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
         - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
         - "traefik.http.routers.${APP_NAME}.tls=true"
-        - "traefik.http.routers.${APP_NAME}.tls.certresolver=le"
+        - "traefik.http.routers.${APP_NAME}.tls.certresolver=myresolver"
         - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
 
 networks:
-  proxy:
-    name: traefik-net
+  traefik_proxy:
     external: true
