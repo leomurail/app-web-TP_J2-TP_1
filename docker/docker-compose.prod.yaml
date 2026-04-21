@@ -17,7 +17,7 @@ services:
         # Expose the app port number to Traefik
         - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
         # Specify the network to use (prefixed by stack name in Swarm)
-        - "traefik.swarm.network=traefik_traefik_proxy"
+        - "traefik.swarm.network=app-web-dev_traefik_proxy"
 
 networks:
   traefik_proxy:
