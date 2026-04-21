@@ -1,22 +1,53 @@
 #!/bin/bash
-set -e
-ENV=${1:-local}
+set -euo pipefail
 
-echo "Installing environment: $ENV"
+# Import common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
-# .env creation if missing
-if [ ! -f .env ]; then
-  cp docker/env/.env.$ENV.template .env
-  echo ".env created from $ENV template"
-fi
+# --- CONFIGURATION ---
+ENV_TARGET=${1:-local}
+TEMPLATE_DIR="docker/env"
 
-# Delegate the Docker launch to Task to reuse the COMPOSE_CMD logic
-if [ "$ENV" == "local" ]; then
-  task build
-  task up
-  # NPM install only for local development
-  npm install
-else
-  task deploy
-fi
+# --- FONCTIONS ---
 
+check_prerequisites() {
+  log_msg "INFO" "Vérification des prérequis pour l'environnement: $ENV_TARGET"
+  command -v docker >/dev/null 2>&1 || { log_msg "ERROR" "Docker n'est pas installé."; exit 1; }
+  command -v task >/dev/null 2>&1 || { log_msg "ERROR" "Task n'est pas installé."; exit 1; }
+}
+
+configure_env() {
+  local TEMPLATE="$TEMPLATE_DIR/.env.$ENV_TARGET.template"
+  
+  if [ ! -f .env ]; then
+    if [ -f "$TEMPLATE" ]; then
+      log_msg "INFO" "Création du fichier .env à partir du template $ENV_TARGET..."
+      cp "$TEMPLATE" .env
+      log_msg "SUCCESS" "Fichier .env créé."
+    else
+      log_msg "ERROR" "Template $TEMPLATE introuvable."
+      exit 1
+    fi
+  else
+    log_msg "INFO" "Le fichier .env existe déjà. On le conserve."
+  fi
+}
+
+install_dependencies() {
+  if [ "$ENV_TARGET" == "local" ]; then
+    log_msg "INFO" "Installation des dépendances npm (local uniquement)..."
+    npm install --silent
+    log_msg "SUCCESS" "Dépendances installées."
+  fi
+}
+
+main() {
+  check_prerequisites
+  configure_env
+  install_dependencies
+  log_msg "SUCCESS" "Installation terminée avec succès pour l'environnement: $ENV_TARGET"
+}
+
+# --- EXECUTION ---
+main

@@ -34,29 +34,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Determine Environment
-        id: env
+      - name: Determine Target Environment
+        id: target
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "target=prod" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
           else
-            echo "target=dev" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
           fi
 
       - name: Create destination directory
-        run: mkdir -p ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
+        run: mkdir -p ~/${{ steps.target.outputs.env }}/${{ secrets.SSH_PATH }}
 
       - name: Sync files
         run: |
           rsync -avz --delete \
             --exclude '.git' \
             --exclude '.github' \
-            ./ ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
+            ./ ~/${{ steps.target.outputs.env }}/${{ secrets.SSH_PATH }}
 
-      - name: Deploy Environment to Swarm (via task install)
+      - name: Remote Deployment
         run: |
-          cd ~/${{ steps.env.outputs.target }}/${{ secrets.SSH_PATH }}
-          task install
-        env:
-          APP_ENV: ${{ steps.env.outputs.target }}
-
+          cd ~/${{ steps.target.outputs.env }}/${{ secrets.SSH_PATH }}
+          # On utilise les commandes prod:* pour le serveur
+          task prod:install ENV=${{ steps.target.outputs.env }}
+          task prod:deploy

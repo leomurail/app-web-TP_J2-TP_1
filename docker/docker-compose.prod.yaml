@@ -7,7 +7,7 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
+        - "traefik.http.routers.${APP_NAME}.rule=Host(`${DOMAIN_NAME}`)"
         - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
         - "traefik.http.routers.${APP_NAME}.tls=true"
         - "traefik.http.routers.${APP_NAME}.tls.certresolver=myresolver"
