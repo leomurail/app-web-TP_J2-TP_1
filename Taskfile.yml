@@ -3,47 +3,49 @@ version: '3'
 dotenv: ['.env']
 
 tasks:
-  install:
-    desc: Initialise l'environnement
+  # --- CYCLE DÉVELOPPEMENT (LOCAL) ---
+  dev:install:
+    desc: Initialisation interactive locale
     cmds:
-      - ./docker/scripts/install.sh $APP_ENV
+      - ./docker/scripts/install.sh local
 
-  build:
-    desc: Build l'image
+  dev:build:
+    desc: Build l'image en local
     cmds:
       - docker compose build
 
-  watch:
-    desc: Mode dev interactif
+  dev:up:
+    desc: Dev avec Hot-Reload (Docker Compose Watch)
     cmds:
-      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml up --build
+      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml watch
 
-  up:
-    desc: Lance l'environnement local
-    cmds:
-      - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml up -d
-
-  down:
+  dev:down:
     desc: Arrête l'environnement local
     cmds:
       - docker compose -f docker-compose.yml -f docker/docker-compose.local.yaml down
 
-  deploy:
-    desc: Deploy Swarm Stack
+  dev:destroy:
+    desc: Nettoyage total (Volumes, .env, node_modules)
     cmds:
-      - docker stack deploy -c docker-compose.yml -c docker/docker-compose.prod.yaml $APP_NAME
+      - ./docker/scripts/destroy.sh
 
-  status:
+  # --- CYCLE PRODUCTION (SERVEURS) ---
+  prod:install:
+    desc: Initialisation sur le serveur distant (Usage CI)
+    cmds:
+      - ./docker/scripts/install.sh {{.ENV}}
+
+  prod:deploy:
+    desc: Déploiement Swarm Stack
+    cmds:
+      - ./docker/scripts/deploy.sh
+
+  prod:status:
     desc: Statut des services Swarm
     cmds:
-      - docker stack services $APP_NAME
+      - docker stack services ${APP_NAME}
 
-  remove:
+  prod:remove:
     desc: Supprime la stack Swarm
     cmds:
-      - docker stack rm $APP_NAME
-
-  clean:
-    desc: Nettoie tout (images & volumes)
-    cmds:
-      - docker compose down --rmi all -v
+      - docker stack rm ${APP_NAME}
