@@ -6,11 +6,18 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # Enable Service discovery for Traefik
         - "traefik.enable=true"
-        - "traefik.http.routers.whoami.rule=Host(`${APP_DOMAIN}`)"
-        - "traefik.http.routers.whoami.entrypoints=websecure"
-        - "traefik.http.routers.whoami.tls=true"
-        - traefik.http.services.whoami.loadbalancer.server.port=${APP_PORT}
+        # Define the router rule (using dynamic APP_NAME)
+        - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
+        # Expose on the HTTPS entrypoint
+        - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
+        # Enable TLS
+        - "traefik.http.routers.${APP_NAME}.tls=true"
+        # Expose the app port number to Traefik
+        - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
+        # Specify the network to use (prefixed by stack name in Swarm)
+        - "traefik.swarm.network=${APP_NAME}_traefik_proxy"
 
 networks:
   traefik_proxy:
