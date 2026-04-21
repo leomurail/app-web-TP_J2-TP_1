@@ -1,18 +1,25 @@
 services:
   app:
     networks:
-      - proxy
+      - traefik_proxy
     deploy:
       mode: replicated
       replicas: 1
       labels:
+        # Enable Service discovery for Traefik
         - "traefik.enable=true"
+        # Define the router rule
         - "traefik.http.routers.${APP_NAME}.rule=Host(`${APP_DOMAIN}`)"
+        # Expose on the HTTPS entrypoint
         - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
+        # Enable TLS
         - "traefik.http.routers.${APP_NAME}.tls=true"
+        # Expose the app port number to Traefik
         - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=${APP_PORT}"
+        # Specify the network to use
+        - "traefik.docker.network=traefik_proxy"
 
 networks:
-  traefik-net:
+  traefik_proxy:
     driver: overlay
     attachable: true
